@@ -1,28 +1,30 @@
 package com.example.demo;
 
 import org.junit.ClassRule;
-import org.junit.runner.RunWith;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.util.TestPropertyValues;
 import org.springframework.context.ApplicationContextInitializer;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
-
-@ContextConfiguration(initializers = {CustomPostgresqlContainer.Initializer.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ContextConfiguration(initializers = {CustomPostgresqlContainer.Initializer.class})
+@Testcontainers
+@DataJpaTest
 public abstract class CustomPostgresqlContainer {
 
     @ClassRule
-    private static final PostgreSQLContainer<?> postgreSQLContainer =
-            new PostgreSQLContainer<>("postgres:12.4")
-                    .withDatabaseName("postgres")
-                    .withUsername("postgres")
-                    .withPassword("root");
+    private static final PostgreSQLContainer<?> postgreSQLContainer;
+
+    static {
+        postgreSQLContainer = new PostgreSQLContainer<>("postgres:12.4")
+                .withDatabaseName("postgres")
+                .withUsername("postgres")
+                .withPassword("root");
+    }
 
     public static class Initializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
         @Override
